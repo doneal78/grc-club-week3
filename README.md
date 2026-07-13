@@ -1,6 +1,6 @@
 \# Week 3: Build the Gate
 
-
+Status: gate verified with a passing pull request on July 12, 2026.
 
 A GitHub Actions workflow that runs the Week 2 Rego policies against a Terraform plan on every pull request and blocks merges when a compliance control fails.
 
