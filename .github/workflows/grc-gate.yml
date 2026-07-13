@@ -9,6 +9,7 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  id-token: write
 
 jobs:
   grc-gate:
@@ -22,6 +23,9 @@ jobs:
           tar xzf conftest.tar.gz
           sudo mv conftest /usr/local/bin
           conftest --version
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3
 
       - name: Run policy gate
         id: gate
@@ -42,12 +46,41 @@ jobs:
             echo "gate_failed=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Upload evidence
+      - name: Sign evidence bundle
+        if: always()
+        run: |
+          tar czf evidence.tar.gz evidence/
+          sha256sum evidence.tar.gz | awk '{print $1}' > evidence.sha256
+          cosign sign-blob --yes --bundle evidence.sig.bundle evidence.tar.gz
+
+      - name: Run tamper test
+        if: always()
+        run: |
+          echo "=== Tamper Test: verify real bundle ==="
+          bash verify-evidence.sh evidence.tar.gz
+          echo
+          echo "=== Tamper Test: verify tampered bundle (must FAIL) ==="
+          cp evidence.tar.gz /tmp/tampered.tar.gz
+          echo "junk" >> /tmp/tampered.tar.gz
+          cp evidence.sha256 /tmp/tampered.sha256
+          cp evidence.sig.bundle /tmp/tampered.sig.bundle
+          if bash verify-evidence.sh /tmp/tampered.tar.gz; then
+            echo "ERROR: tampered bundle should have failed verification"
+            exit 1
+          else
+            echo "PASS: tampered bundle correctly rejected"
+          fi
+
+      - name: Upload evidence and signatures
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: grc-gate-evidence
-          path: evidence/
+          path: |
+            evidence/
+            evidence.tar.gz
+            evidence.sha256
+            evidence.sig.bundle
 
       - name: Fail job if any control failed
         if: steps.gate.outputs.gate_failed == 'true'
