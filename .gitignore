@@ -1,4 +1,7 @@
+evidence.tar.gz
+evidence.sha256
+evidence.sig.bundle
 terraform/.terraform/
+terraform/tfplan
 terraform/terraform.tfstate
 terraform/terraform.tfstate.backup
-terraform/tfplan

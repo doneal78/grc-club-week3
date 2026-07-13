@@ -11,7 +11,6 @@ echo "Verifying evidence bundle: $BUNDLE"
 echo
 
 # 1. INTEGRITY
-# Recompute the SHA-256 of the bundle and compare to the sidecar file.
 echo "Check 1: Integrity (SHA-256)"
 if [ ! -f "$SIDECAR" ]; then
   echo "FAIL: sidecar file $SIDECAR not found"
@@ -36,7 +35,6 @@ echo "PASS: hash matches"
 echo
 
 # 2. AUTHENTICITY
-# Verify the Cosign signature bundle, pinning the OIDC issuer to GitHub Actions.
 echo "Check 2: Authenticity (Cosign keyless signature)"
 if [ ! -f "$SIG_BUNDLE" ]; then
   echo "FAIL: signature bundle $SIG_BUNDLE not found"
@@ -46,6 +44,7 @@ fi
 cosign verify-blob \
   --bundle "$SIG_BUNDLE" \
   --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+  --certificate-identity-regexp "https://github.com/doneal78/grc-club-week3/" \
   "$BUNDLE"
 
 echo "PASS: signature verified"
