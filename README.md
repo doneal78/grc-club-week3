@@ -72,7 +72,7 @@ This week uses the simple path: plan.json is generated locally and committed to 
 
 
 
-Week 1: https://gitlab.com/doneal78-group/grc-engineering-portfolio/grc-club-week1
+Week 1: https://github.com/doneal78/grc-club-week1
 
-Week 2: https://gitlab.com/doneal78-group/grc-engineering-portfolio/grc-club-week2
+Week 2: https://github.com/doneal78/grc-club-week2
 
